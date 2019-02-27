@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.js"></script>
+
+    <title>hexdrop</title>
+</head>
+
+<body>
+    <script>
+        const s = 500;
+        const n = 6;
+        const cells = [];
+
+        function setup() {
+
+            createCanvas(s, s);
+            background(200);
+
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const c = new Cell(i * s / n, j * s / n, s / n / 1.67, i * n + j);
+                    c.render();
+                    cells.push(c);
+                }
+            }
+
+
+        }
+
+        function draw() {
+            cells.forEach(c => c.render());
+        }
+
+        function mousePressed() {
+            console.log(mouseX, mouseY);
+            const c = find(mouseX, mouseY);
+            console.log(c);
+            c.fill = c.fill === 'goldenrod' ? 'perwinkle' : 'goldenrod';
+        }
+
+        // Know which cell is being clicked
+        // Make a shape (with an origin cell)
+        // Make it fall
+        // If it can
+        // Make it stop at the bottom
+        // Clear a full row
+
+        function find(u, v) {
+            return cells.sort((a, b) => a.dist(u, v) - b.dist(u, v))[0];
+        }
+
+        class Cell {
+            constructor(x, y, r, i) {
+                this.x = x;
+                this.y = y;
+                this.r = r;
+                this.fill = Math.random() > 0.5 ? 'plum' : 'cornflowerblue';
+                this.i = i;
+                this.xctr = this.x + s / n / 2;
+                this.yctr = this.y + s / n / 4;
+                if (this.x / (s / n) % 2) this.yctr += s / n / 2;
+
+                this.dist = function (u, v) {
+                    return Math.pow((u - this.xctr) * (u - this.xctr) + (v - this.yctr) * (v - this.yctr), 0.5);
+                }
+
+                this.render = function () {
+                    // polygon(this.x, this.y, this.r, 6);
+                    push();
+                    translate(this.xctr, this.yctr);
+                    fill(this.fill);
+                    beginShape();
+                    for (let i = 0; i < 6; i++) {
+                        vertex(this.r * Math.cos(Math.PI * i / 3), this.r * Math.sin(Math.PI * i / 3));
+                    }
+                    endShape();
+                    fill('black');
+                    text(this.i, 0, 0);
+                    pop();
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
